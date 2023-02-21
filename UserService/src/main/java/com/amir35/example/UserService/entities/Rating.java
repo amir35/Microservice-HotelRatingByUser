@@ -9,8 +9,6 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity
-@Table(name = "micro_rating")
 public class Rating {
 
     @Id
@@ -23,4 +21,6 @@ public class Rating {
     private int rating;
 
     private String feedback;
+
+    private Hotel hotel;
 }
