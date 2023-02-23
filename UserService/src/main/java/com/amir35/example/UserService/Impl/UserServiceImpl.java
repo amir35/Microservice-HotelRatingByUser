@@ -4,6 +4,8 @@ import com.amir35.example.UserService.entities.Hotel;
 import com.amir35.example.UserService.entities.Rating;
 import com.amir35.example.UserService.entities.User;
 import com.amir35.example.UserService.exceptions.ResourceNotFoundException;
+import com.amir35.example.UserService.feign.services.HotelService;
+import com.amir35.example.UserService.feign.services.RatingService;
 import com.amir35.example.UserService.repositories.UserRepository;
 import com.amir35.example.UserService.services.UserService;
 import org.slf4j.Logger;
@@ -28,6 +30,12 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private HotelService hotelService;
+
+    @Autowired
+    private RatingService ratingService;
+
     private Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Override
@@ -43,7 +51,8 @@ public class UserServiceImpl implements UserService {
 
         List<User> listUser = userRepository.findAll().stream().map(
                 user -> {
-                ArrayList<Rating> ratingData = restTemplate.getForObject("http://localhost:8083/ratings/users/"+user.getUserId(), ArrayList.class);
+                //ArrayList<Rating> ratingData = restTemplate.getForObject("http://localhost:8083/ratings/users/"+user.getUserId(), ArrayList.class);
+                ArrayList<Rating> ratingData = ratingService.getRatingsForAllUser(user.getUserId());
                 user.setRatings(ratingData);
                 return user;
                 }
@@ -62,8 +71,10 @@ public class UserServiceImpl implements UserService {
         //fetch ratings given by the above user from Rating Service
         //http://localhost:8083/ratings/users/userId
         //Rating[] ratingData = restTemplate.getForObject("http://localhost:8083/ratings/users/"+user.getUserId(), Rating[].class);
-        Rating[] ratingData = restTemplate.getForObject("http://RATING-SERVICE/ratings/users/"+user.getUserId(), Rating[].class);
-        logger.info("{}", ratingData);
+        //Rating[] ratingData = restTemplate.getForObject("http://RATING-SERVICE/ratings/users/"+user.getUserId(), Rating[].class);
+        //logger.info("{}", ratingData);
+
+        Rating[] ratingData = ratingService.getRatingsForUser(user.getUserId());
 
 
         List<Rating> ratings = Arrays.stream(ratingData).toList();
@@ -72,9 +83,15 @@ public class UserServiceImpl implements UserService {
             //fetch hotels given according to ratings given from Hotel Service
             //http://localhost:8082/hotels/hotelId
             //ResponseEntity<Hotel> hotelEntity = restTemplate.getForEntity("http://localhost:8082/hotels/"+rating.getHotelId(), Hotel.class);
-            ResponseEntity<Hotel> hotelEntity = restTemplate.getForEntity("http://HOTEL-SERVICE/hotels/"+rating.getHotelId(), Hotel.class);
-            Hotel hotel = hotelEntity.getBody();
-            logger.info("Hotels list {} ", hotelEntity.getStatusCode());
+
+            //commenting next 3 lines to use open feign
+            //ResponseEntity<Hotel> hotelEntity = restTemplate.getForEntity("http://HOTEL-SERVICE/hotels/"+rating.getHotelId(), Hotel.class);
+            //Hotel hotel = hotelEntity.getBody();
+            //logger.info("Hotels list {} ", hotelEntity.getStatusCode());
+
+
+            Hotel hotel = hotelService.getHotel(rating.getHotelId());
+
             rating.setHotel(hotel);
             return rating;
         }).collect(Collectors.toList());
