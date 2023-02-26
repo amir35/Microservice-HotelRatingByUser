@@ -1,5 +1,6 @@
 package com.amir35.example.UserService.Impl;
 
+import com.amir35.example.UserService.dto.UserDto;
 import com.amir35.example.UserService.entities.Hotel;
 import com.amir35.example.UserService.entities.Rating;
 import com.amir35.example.UserService.entities.User;
@@ -11,7 +12,6 @@ import com.amir35.example.UserService.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -39,10 +39,19 @@ public class UserServiceImpl implements UserService {
     private Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Override
-    public User saveUser(User user) {
+    public User saveUser(UserDto userDto) {
         //Generate unique user id
         String randomUserId = UUID.randomUUID().toString();
-        user.setUserId(randomUserId);
+
+        Rating rating = Rating.builder().userId(randomUserId).hotelId(userDto.getHotelId()).
+                rating(userDto.getRating()).feedback(userDto.getFeedback()).build();
+
+        ratingService.createRating(rating);
+        logger.info("Ratings from user: {}" +rating);
+
+        User user = User.builder().userId(randomUserId).name(userDto.getName()).
+                email(userDto.getEmail()).about(userDto.getAbout()).build();
+
         return userRepository.save(user);
     }
 
@@ -100,5 +109,16 @@ public class UserServiceImpl implements UserService {
 
 
         return user;
+    }
+
+    @Override
+    public String deleteUser(String userId) {
+        userRepository.deleteById(userId);
+        return "Successfully Deleted";
+    }
+
+    @Override
+    public User updateUser(String userId, User user) {
+        return userRepository.save(user);
     }
 }
