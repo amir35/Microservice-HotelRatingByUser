@@ -73,4 +73,4 @@ spring:
 		
 	- Comment out the common code from application.yml and add the URL for config server
 		  config:
-    			import: configserver:http://localhost:8085
+    			import: optional:configserver:http://localhost:8085
