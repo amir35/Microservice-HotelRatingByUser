@@ -65,3 +65,12 @@ spring:
 			
 	- Create a repository on Github with the name "microservice-config-file" as you mentioned in application.yml file.
 	- Create application.yml file in the repository and write down the configuration there.
+	- Then add the below dependency in the microservices:
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+		
+	- Comment out the common code from application.yml and add the URL for config server
+		  config:
+    			import: configserver:http://localhost:8085
