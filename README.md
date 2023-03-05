@@ -41,3 +41,27 @@ spring:
           uri: lb://RATING-SERVICE
           predicates:
             - Path=/ratings/**
+
+
+ 4. Implementing Config Client in microservices
+
+	- Create a new Spring Boot project with below dependency:
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-config-server</artifactId>
+		</dependency>
+		
+	- Add @EnableConfigServer in main class
+	- Configure the URL path in application.yml file
+		spring:
+  		 application:
+   		  name: CONFIG-SERVER
+  		 cloud:
+    		  config:
+      		    server:
+        	      git:
+          		uri: https://github.com/amir35/microservice-config-file
+          		clone-on-start: true
+			
+	- Create a repository on Github with the name "microservice-config-file" as you mentioned in application.yml file.
+	- Create application.yml file in the repository and write down the configuration there.
