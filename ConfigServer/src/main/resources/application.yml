@@ -9,4 +9,4 @@ spring:
       server:
         git:
           uri: https://github.com/amir35/microservice-config-file
-          clone-on-start: true
+#          clone-on-start: true
