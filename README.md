@@ -74,3 +74,18 @@ spring:
 	- Comment out the common code from application.yml and add the URL for config server
 		  config:
     			import: optional:configserver:http://localhost:8085
+
+
+ 5. Implementing Circuit Bresker functionality using Resilience4j.
+ 	- Add Acyautor and Aop dependency in pom.xml
+	- Add below dependency for resilience4j and sproingboot
+			<dependency>
+			<groupId>io.github.resilience4j</groupId>
+			<artifactId>resilience4j-spring-boot2</artifactId>
+			<version>1.7.0</version>
+		</dependency>
+	- For any Controller method, add the @CircuitBreaker annotation as given below:
+		@CircuitBreaker(name = "ratingHotelBreaker", fallbackMethod = "ratingHotelFallback")
+	- Then we need to create a fallback method with the name "ratingHotelFallback" in the controller class itself
+	- Remember the return type of fallback method should be same as the method on which we are using @CircuitBreaker.
+	- Then we need to configure the resilience4j parameters in application.yml file.
