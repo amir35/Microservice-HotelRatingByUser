@@ -4,6 +4,7 @@ import com.amir35.example.UserService.dto.UserDto;
 import com.amir35.example.UserService.entities.User;
 import com.amir35.example.UserService.services.UserService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    int retryCount = 1;
+
     private Logger logger = LoggerFactory.getLogger(UserController.class);
 
     //create
@@ -31,8 +34,11 @@ public class UserController {
 
     //single user
     @GetMapping("/{userId}")
-    @CircuitBreaker(name = "ratingHotelBreaker", fallbackMethod = "ratingHotelFallback")
+    //@CircuitBreaker(name = "ratingHotelBreaker", fallbackMethod = "ratingHotelFallback")
+    @Retry(name = "ratingHotelService", fallbackMethod = "ratingHotelFallback")
     public ResponseEntity<User> getSingleUser(@PathVariable String userId){
+        logger.info("Retry Count: {}", retryCount);
+        retryCount++;
         User user = userService.getUser(userId);
         return ResponseEntity.ok(user);
     }
@@ -41,7 +47,7 @@ public class UserController {
     //make sure Return type should be same as that of the calling method --> public ResponseEntity<User> getSingleUser
     //so here it is ResponseEntity<User>
     public ResponseEntity<User> ratingHotelFallback(String userId, Exception ex) {
-        logger.info("Fallback is executed because service is down : ", ex.getMessage());
+        //logger.info("Fallback is executed because service is down : ", ex.getMessage());
 
         User user = User.builder()
                 .email("dummy@gmail.com")
