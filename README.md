@@ -89,3 +89,9 @@ spring:
 	- Then we need to create a fallback method with the name "ratingHotelFallback" in the controller class itself
 	- Remember the return type of fallback method should be same as the method on which we are using @CircuitBreaker.
 	- Then we need to configure the resilience4j parameters in application.yml file.
+
+ 6. Implementing Retry functionality of Resilience4j.
+ 	- On the same method on which we have used @CircuitBreaker, we can use @Retry and need to give the fallback method name as given below
+ 		@Retry(name = "ratingHotelService", fallbackMethod = "ratingHotelFallback")
+	- Inside the same controller method, we can make use of logger to track any variable count like how many times we want to hit the particular microservice, in case it is down or slow.
+	- Then we need to configure the resilience4j parameters in application.yml file to give max-attempt or waitDuration parameters.
